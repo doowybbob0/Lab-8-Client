@@ -31,9 +31,7 @@ public class Grid {
         bundle=bundleDef;
         out=outToClient;
         in=inn;
-        f.addWindowListener(new WindowListener() {
-            @Override
-            public void windowActivated(WindowEvent e) {
+        try {
                 try {
                     outToClient.writeObject(Comand.showTable);
                     String sb= (String) inn.readObject(); 
@@ -110,7 +108,7 @@ public class Grid {
                 button.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e1) {
-                        e.getWindow().setVisible(false);
+                        f.setVisible(false);
 //                        try {
 //                            //WindowClient.createGUI(outToClient,inn, us,bundleDef,log,color);
 //                        } catch (IOException | InterruptedException ex) {
@@ -120,37 +118,22 @@ public class Grid {
                 });
                 f.add(button, BorderLayout.SOUTH);
                 f.pack();
-            }
+            
+        
 
-            @Override
-            public void windowClosing(WindowEvent event) { }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowOpened(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-            }
-        });
         //f.setSize(new Dimension(500,400));
         f.setLocation(100,100);
         f.setVisible(true);
         f.setResizable(false);
         f.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         f.setVisible(true);
+        }catch(StringIndexOutOfBoundsException nodata) {
+        	JOptionPane.showMessageDialog(f,
+            	    "No data to view");
+        	f.setVisible(false);
+        	
+        }
+
     }
 
     private class MouseHandler extends MouseAdapter {
@@ -184,7 +167,8 @@ public class Grid {
                     k++;
                 }
                 try {
-                    Object o = arr[k][1];
+                	System.out.println("LENGH"+arr.length);
+                    Object o = arr[k-1][1];
                     System.out.println(o);
                         out.writeObject(Comand.table);
                         out.writeObject(o);

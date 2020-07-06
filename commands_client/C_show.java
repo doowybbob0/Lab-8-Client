@@ -2,6 +2,7 @@ package commands_client;
 
 public class C_show {
 	public static String[][] show(String sb) {
+		try {
 		//extract each line from the sb by splitting after the newline character \n
         final String[] rows = sb.toString().split("\n");
         //each line represent a row, so the numbers of lines is the number of rows in our matrix
@@ -44,6 +45,11 @@ public class C_show {
 //                }
 //            }
 //        }
+        System.out.println(matrix);
         return matrix;
+	}catch(Exception exc) {
+		System.out.println("Empty array");
+		final String[][] matrix = new String[1][10];
+		return matrix; }
 	}
 }

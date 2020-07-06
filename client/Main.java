@@ -32,9 +32,6 @@ public class Main {
 	        JFrame frame2 = new JFrame("Start");
 	        frame2.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-	        frame2.addWindowListener(new WindowListener() {
-
-	            public void windowActivated(WindowEvent event) {// все время пока окно активно
 	                JPanel panel = new JPanel();
 	                JLabel label11 = new JLabel("Язык/Language");
 
@@ -71,42 +68,14 @@ public class Main {
 	        						    JOptionPane.ERROR_MESSAGE);
 	                            //WindEx.createWO(bundleDef);
 	                        }
-	                        event.getWindow().setVisible(false);
+	                        frame2.setVisible(false);
 	                    }
 	                });
 	                panel.add(button);
 	                frame2.add(panel);
-	            }
 
-	            public void windowClosed(WindowEvent event) {
-	            }
 
-	            public void windowClosing(WindowEvent event) {
-	                Object[] options = { "Да", "Нет!" };
-	                int n = JOptionPane
-	                        .showOptionDialog(event.getWindow(), "Вы уверены что хотите выйти?",
-	                                "Подтверждение", JOptionPane.YES_NO_OPTION,
-	                                JOptionPane.QUESTION_MESSAGE, null, options,
-	                                options[0]);
-	                if (n == 0) {
-	                    long lo=0;
-	                    event.getWindow().setVisible(false);
-	                    System.exit(0);
-	                }
-	            }
 
-	            public void windowDeactivated(WindowEvent event) {//когда окно свернуто
-	            }
-
-	            public void windowDeiconified(WindowEvent event) {//когда мы только только развернули окно
-	            }
-
-	            public void windowIconified(WindowEvent event) {
-	            }
-
-	            public void windowOpened(WindowEvent event) {//когда окно только появляется
-	            }
-	        });
 	        UIManager.put("Button.font", FONTb);
 	        UIManager.put("Label.font", FONT);
 	        frame2.setPreferredSize(new Dimension(490, 130));

@@ -21,6 +21,10 @@ import java.util.TimerTask;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import commands_client.C_show;
 
@@ -30,14 +34,21 @@ import utils.*;
 
 public class Controller extends JFrame {
 
-	private JPanel contentPane;
-	private static Controller frame;
+	
+	private TableModelListener tableModelListener;
+	public static JPanel contentPane;
+	public static Controller frame;
 	public static ObjectOutputStream actionOut;
 	public static ObjectInputStream actionIn;
 	public static Long user_id;
 	public static ResourceBundle bundleDef;
-	static Object matrix[][];
+	static String matrix[][];
 	static JTable table1;
+	public static String login;
+	public static JButton btnChngpass;
+	public static JButton btnNewButton;
+	public static JMenuBar menuBar;
+	
 	public static  String[] columnNames = {
 			"ID",
             "Name",
@@ -52,12 +63,27 @@ public class Controller extends JFrame {
             "Author ID"
     };
 	
-	public static void initialize(ObjectOutputStream actionOutb,ObjectInputStream actionInb, Long user_idb,String login, ResourceBundle bundleDefb) {
+	
+	
+	public static void updateLocale() {
+		try {
+		btnChngpass.setText(new String(bundleDef.getString("NEWPASSWORD").getBytes("ISO-8859-1"),"Cp1251"));
+		btnNewButton.setText(new String(bundleDef.getString("LANG").getBytes("ISO-8859-1"),"Cp1251"));
+		frame.validate();
+		frame.repaint();
+		frame.setVisible(false);
+		frame.setVisible(true);
+		}catch(Exception updlocalex) {updlocalex.printStackTrace();}
+	}
+	
+	
+	public static void initialize(ObjectOutputStream actionOutb,ObjectInputStream actionInb, Long user_idb,String loginb, ResourceBundle bundleDefb) {
 		
 		actionIn=actionInb;
 		actionOut=actionOutb;
 		user_id=user_idb;
 		bundleDef=bundleDefb;
+		login=loginb;
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -71,16 +97,22 @@ public class Controller extends JFrame {
 			}
 		});
 	}
+	
+
+	
 	/**
 	 * Create the frame.
 	 */
 	public Controller() {
+		
+		repaint();
+		
 		setTitle("Controller");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 667, 550);
+		setBounds(100, 100, 1000, 550);
 		
-		JMenuBar menuBar = new JMenuBar();
+		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -93,6 +125,7 @@ public class Controller extends JFrame {
                 if (e.getSource() == btnHelp) {
                 	Help help = new Help();
                 	help.setVisible(true);
+//                	
                 	
                 }
             }
@@ -120,8 +153,8 @@ public class Controller extends JFrame {
                 }
             }
         });
-		
-		JButton btnChngpass = new JButton("Change password");
+		try {
+		btnChngpass = new JButton(new String(bundleDef.getString("NEWPASSWORD").getBytes("ISO-8859-1"),"Cp1251"));
 		btnChngpass.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -130,8 +163,10 @@ public class Controller extends JFrame {
 			}
 		});
 		menuBar.add(btnChngpass);
+		}catch(Exception newpassex) {newpassex.printStackTrace();}
+		
 		try {
-		JLabel lblUserID = new JLabel(new String(bundleDef.getString("IDINFO").getBytes("ISO-8859-1"),"Cp1251")+" "+user_id);
+		JLabel lblUserID = new JLabel("   ID: "+user_id);
 		
 		lblUserID.setAlignmentX(0.5f);
 		lblUserID.setBounds(new Rectangle(5, 0, 5, 0));
@@ -143,11 +178,11 @@ public class Controller extends JFrame {
 		contentPane.setLayout(null);
 		
 		JPanel table_panel = new JPanel();
-		table_panel.setBounds(10, 231, 639, 254);
+		table_panel.setBounds(10, 231, 972, 254);
 		contentPane.add(table_panel);
 		
 		JPanel commands_panel = new JPanel();
-		commands_panel.setBounds(10, 11, 639, 107);
+		commands_panel.setBounds(10, 11, 972, 107);
 		contentPane.add(commands_panel);
 		commands_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
@@ -197,14 +232,28 @@ public class Controller extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
-					Grid gr = new windows.Grid(actionOut, actionIn, bundleDef, user_id);
+					
+					
+					Grid_beta gr = new windows.Grid_beta(actionOut, actionIn, bundleDef, user_id);
 				}catch (Exception eGrid) {eGrid.printStackTrace();}
 			}
 		});
 		commands_panel.add(btnViewGrid);
 		
+		try {
+		btnNewButton = new JButton(new String(bundleDef.getString("LANG").getBytes("ISO-8859-1"),"Cp1251"));
+		btnNewButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Language lng = new Language();
+            	lng.setVisible(true);
+			}
+		});
+		commands_panel.add(btnNewButton);
+		}catch(Exception langex) {langex.printStackTrace();}
+		
 		JPanel sorting_panel = new JPanel();
-		sorting_panel.setBounds(10, 173, 639, 47);
+		sorting_panel.setBounds(10, 173, 972, 47);
 		contentPane.add(sorting_panel);
 		sorting_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
@@ -220,29 +269,37 @@ public class Controller extends JFrame {
 		
 		
 		try {
-		JLabel lblNewLabel = new JLabel(new String(bundleDef.getString("TABLESORTOPTIONS").getBytes("ISO-8859-1"),"Cp1251"));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setBounds(250, 128, 181, 33);
-		contentPane.add(lblNewLabel);	
+//		JLabel lblNewLabel = new JLabel(new String(bundleDef.getString("TABLESORTOPTIONS").getBytes("ISO-8859-1"),"Cp1251"));
+//		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+//		lblNewLabel.setBounds(250, 128, 181, 33);
+//		contentPane.add(lblNewLabel);	
 //		JLabel label = new JLabel(new String(bundleDef.getString("TABLE").getBytes("ISO-8859-1"),"Cp1251"));
 //		table_panel.add(label);
-        JLabel jLabel = new JLabel(new String(bundleDef.getString("WT1").getBytes("ISO-8859-1"),"Cp1251"));
-        table_panel.add(jLabel);
+//        JLabel jLabel = new JLabel(new String(bundleDef.getString("WT1").getBytes("ISO-8859-1"),"Cp1251"));
+//        table_panel.add(jLabel);
         
-        Timer timer = new Timer();
+//        Timer timer = new Timer();
 
-        timer.schedule( new TimerTask() {
-            public void run() {
-            	try {
-               // do your work
-            	Tab(table_panel,scrollPane,actionIn,actionOut,bundleDef,user_id);
-//		        JLabel labelv = new JLabel(new String(bundleDef.getString("WT2").getBytes("ISO-8859-1"),"Cp1251"));
-//		        table_panel.add(labelv);
-		        //table_panel.add(button);
-		        frame.getContentPane().add(table_panel);
-            	}catch(Exception et) {}
-            }
-         }, 0, 15*1000);
+//        timer.schedule( new TimerTask() {
+//            public void run() {
+//            	try {
+//               // do your work
+//            	Tab(table_panel,scrollPane,actionIn,actionOut,bundleDef,user_id);
+////		        JLabel labelv = new JLabel(new String(bundleDef.getString("WT2").getBytes("ISO-8859-1"),"Cp1251"));
+////		        table_panel.add(labelv);
+//		        //table_panel.add(button);
+//		        frame.getContentPane().add(table_panel);
+//            	}catch(Exception et) {}
+//            }
+//         }, 0, 15*1000);
+        
+        
+        Tab(table_panel,scrollPane,actionIn,actionOut,bundleDef,user_id);
+	//    JLabel labelv = new JLabel(new String(bundleDef.getString("WT2").getBytes("ISO-8859-1"),"Cp1251"));
+	//    table_panel.add(labelv);
+	    //table_panel.add(button);
+	    //frame.getContentPane().add(table_panel);
+	    
         
         
 		}catch(Exception e) {
@@ -272,22 +329,77 @@ public class Controller extends JFrame {
 		});
 	}
 	
-	public static void Tab(JPanel panel,JScrollPane scrollPane2,ObjectInputStream inn,ObjectOutputStream outToClient,ResourceBundle bundleDef,long us) throws IOException, ClassNotFoundException {
+
+	
+	
+	
+	public void Tab(JPanel panel,JScrollPane scrollPane2,ObjectInputStream inn,ObjectOutputStream outToClient,ResourceBundle bundleDef,long us) throws IOException, ClassNotFoundException {
 		
         Comand s = Comand.showTable;
         outToClient.writeObject(s);          
         String sb= (String) inn.readObject(); 
         matrix = C_show.show(sb);
-        //String data2[][]= (String[][]) inn.readObject();
-        //System.out.println(data2);
-        table1 = new JTable(matrix,columnNames){
-            public boolean isCellEditable(int row, int col){
-                return false;
-            }
+        
+        DefaultTableModel model = new DefaultTableModel(matrix, columnNames) {
+        	public boolean isCellEditable(int row, int col){
+            return false;
+          }
         };
         
-        table1.setAutoCreateRowSorter(true);
-        table1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        table1 = new JTable(model);
+        	
+        //String data2[][]= (String[][]) inn.readObject();
+        //System.out.println(data2);
+//        table1 = new JTable(matrix,columnNames){
+//            public boolean isCellEditable(int row, int col){
+//                return false;
+//            }
+//        };
+        
+        
+        
+        
+        
+        
+        Timer timer = new Timer();
+        timer.schedule( new TimerTask() {
+            public void run() {
+            	try {
+            		Comand s = Comand.showTable;
+                    outToClient.writeObject(s);          
+                    String sb= (String) inn.readObject(); 
+                    String[][] safeMatrix = new String[1][1];                    
+                    matrix = C_show.show(sb);
+                    System.out.println("Updating");
+                    
+//                    table1 = new JTable(matrix,columnNames){
+//                        public boolean isCellEditable(int row, int col){
+//                            return false;
+//                        }
+//                    };
+                    DefaultTableModel model = new DefaultTableModel(matrix, columnNames) {
+                    	public boolean isCellEditable(int row, int col){
+                        return false;
+                      }
+                    };
+                    table1.setModel(model);
+                    
+                    table1.repaint();
+
+                    
+                    table1.setAutoCreateRowSorter(true);
+                    table1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+                    
+//                    scrollPane2.setViewportView(table1);
+//                    scrollPane2.getVerticalScrollBar();
+//                    scrollPane2.setPreferredSize(new Dimension(830,130));
+//                    panel.add(scrollPane2,BorderLayout.CENTER);
+                    //setTableModelListener();
+		       
+            	}catch(Exception et) {et.printStackTrace();}
+            }
+         }, 0, 15*1000);
+        
         table1.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -303,6 +415,7 @@ public class Controller extends JFrame {
                         outToClient.flush();
                         SpaceMarine sp =(SpaceMarine) inn.readObject();
                         if(sp!=null){
+                        	System.out.println("Authorized to edit element");
                             long key = (long) inn.readObject();
                             String sx=String.valueOf(sp.getCordinatesX());
                             String sy=String.valueOf(sp.getCordinatesY());
@@ -313,7 +426,7 @@ public class Controller extends JFrame {
 //                            Update_table.createW2(outToClient,inn,bundleDef,key,sp.getName(),sx,sy,shealth,sheight,sweapon,smweapon,sp.getChapter().getLegion(),sp.getChapter().getSquad(),user_id);
                             Update_table_beta updt = new Update_table_beta(outToClient,inn,bundleDef,key,sp.getName(),sx,sy,shealth,sheight,sweapon,smweapon,sp.getChapter().getLegion(),sp.getChapter().getSquad(),user_id);
                             updt.setVisible(true);
-                        }
+                        }else {System.out.println("Not authorized");}
                     } catch (IOException | ClassNotFoundException e) {
                     	
                         e.printStackTrace();
@@ -321,9 +434,13 @@ public class Controller extends JFrame {
                 }
             }
         });
+        
         scrollPane2.setViewportView(table1);
         scrollPane2.getVerticalScrollBar();
-        scrollPane2.setPreferredSize(new Dimension(550,130));
+        scrollPane2.setPreferredSize(new Dimension(830,130));
         panel.add(scrollPane2,BorderLayout.CENTER);
+        
+        
+        
     }
 }

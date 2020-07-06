@@ -39,6 +39,12 @@ public class Update_table_beta extends JFrame {
 	private JTextField textLegion;
 	private JTextField textSquad;
 
+	
+	public void Close() {
+		super.setVisible(false);
+	}
+	
+	
 	public Update_table_beta(ObjectOutputStream actionOut, ObjectInputStream inn, ResourceBundle bundleDef,long id,String name0,String x0,String y0,String health0,String height0,String weapon0,String meleeweapon0,String chapterLegion0,String chapterSquad0,Long k1) {
 		setBounds(100, 100, 415, 371);
 		contentPane = new JPanel();
@@ -276,6 +282,7 @@ public class Update_table_beta extends JFrame {
 //			                actionOut.writeObject(spacemarine);
 			                JOptionPane.showMessageDialog(contentPane,
 			                	    "Element inserted successfully");
+			                Close();
 						}catch(Exception eInsertKey) {eInsertKey.printStackTrace();}
 		                System.out.println("Element insert finished");
 		                //contentPane.setVisible(false);

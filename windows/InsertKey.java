@@ -36,6 +36,11 @@ public class InsertKey extends JFrame {
 	private JTextField textHeight;
 	private JTextField textLegion;
 	private JTextField textSquad;
+	
+	
+	public void Close() {
+		super.setVisible(false);
+	}
 
 	public InsertKey(ObjectOutputStream actionOut) {
 		setBounds(100, 100, 415, 371);
@@ -261,7 +266,8 @@ public class InsertKey extends JFrame {
 			                	    "Element inserted successfully");
 						}catch(Exception eInsertKey) {eInsertKey.printStackTrace();}
 		                System.out.println("Element insert finished");
-		                //contentPane.setVisible(false);
+		                Close();
+		                
 					}				
 				}
 			});

@@ -51,9 +51,7 @@ public class Auth {
     	System.out.println("[WARNING] Launching Auth tool");  
         JFrame frame = new JFrame("Авторизация");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowListener() {
-        public void windowActivated(WindowEvent event) { // все время пока окно активно          		            		
-	                try {
+
 		                JPanel contents = new JPanel();
 		                JLabel label0 = null;
 		                label0 = new JLabel(new String(bundleDef.getString("WAL").getBytes("ISO-8859-1"),"Cp1251"));
@@ -109,7 +107,7 @@ public class Auth {
 	                                            ObjectOutputStream actionOut = new ObjectOutputStream(socket.getOutputStream());
                                                 ObjectInputStream actionIn = new ObjectInputStream(socket.getInputStream());
 	                                            ConnectToServer.interactiveMode(actionOut,actionIn, user_id, bundleDef, user_login.getText());
-	                                            event.getWindow().setVisible(false);
+	                                            frame.setVisible(false);
 	                                            
 	                                		}else {
 	                                			System.out.println("[AUTH] Wrong password");
@@ -135,54 +133,7 @@ public class Auth {
 	                });
 	                
 	                frame.add(contents);
-	                } catch (Exception e) {
-	                	JOptionPane.showMessageDialog(frame,
-							    "Cannot reach server",
-							    "Error",
-							    JOptionPane.ERROR_MESSAGE);
-	                    e.printStackTrace();
-	                }
-            	
-            }
-
-            public void windowClosed(WindowEvent event) {
-
-            }
-
-            public void windowClosing(WindowEvent event) {
-                try {
-                    Object[] options = { new String(bundleDef.getString("YES").getBytes("ISO-8859-1"),"Cp1251"), new String(bundleDef.getString("NO").getBytes("ISO-8859-1"),"Cp1251") };
-                    int n = 0;
-                    n = JOptionPane
-                            .showOptionDialog(event.getWindow(),new String(bundleDef.getString("EXIT").getBytes("ISO-8859-1"),"Cp1251") ,
-                                    "Подтверждение", JOptionPane.YES_NO_OPTION,
-                                    JOptionPane.QUESTION_MESSAGE, null, options,
-                                    options[0]);
-                if (n == 0) {
-                	//authOut.writeUTF("");
-                    event.getWindow().setVisible(false);
-                    System.exit(0);
-                }
-                } catch (IOException e) {
-                e.printStackTrace();
-            }
-            }
-
-            public void windowDeactivated(WindowEvent event) {//когда окно свернуто
-
-            }
-
-            public void windowDeiconified(WindowEvent event) {//когда мы только только развернули окно
-
-            }
-
-            public void windowIconified(WindowEvent event) {
-
-            }
-
-            public void windowOpened(WindowEvent event) {//когда окно только появляется
-            }
-        });
+	                
         UIManager.put("Label.font", FONT);
         frame.setPreferredSize(new Dimension(510, 190));
         frame.pack();
